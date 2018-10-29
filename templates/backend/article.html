@@ -1,0 +1,159 @@
+{% extends 'backend/backend_base.html' %}
+{% load search %}
+
+{%  block css %}
+    {{ block.super }}
+    <style>
+        #item2 .item-title{
+            {#border-left: 3px solid transparent;#}
+            border-left: 5px solid #1c5a9c;
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div style="margin-left: -60px">
+            <ol class="breadcrumb" style="margin-bottom: 0;">
+                <li><a href="#">文章管理</a></li>
+                <li class="active">文章列表</li>
+            </ol>
+
+            <div style="border: 1px #dddddd; border-left: 3px solid #337ab7;">
+                <div  class="row" style="margin: 0; padding: 8px 0;">
+                    <div class="col-xs-6" style="text-align: left;">
+                        <i class="fa fa-search" aria-hidden="true"> 搜索条件</i>
+                    </div>
+                </div>
+            </div>
+
+
+            <div style="border: 1px solid #dddddd; margin: 0; padding: 8px 0;">
+                <div  class="row" style="margin: 0; padding: 8px 0;">
+                    <div class="col-xs-1" style="text-align: right;">
+                        {% article_type_all kwargs_dict %}
+                    </div>
+
+                    {% article_type_combine article_type_list kwargs_dict %}
+                </div>
+
+                <div class="row" style="margin: 0; padding: 8px 0;">
+                    <div class="col-xs-1" style="text-align: right;">
+                        {% tag_all kwargs_dict %}
+                    </div>
+
+                    {% tag_combine tag_list kwargs_dict %}
+                </div>
+            </div>
+
+            <div style="border: 1px #dddddd; border-left: 3px solid #337ab7;">
+                <div class="row" style=" padding-top:5px;">
+                    <div class="col-xs-6" style="padding-left: 30px; line-height: 35px; text-align: left;">
+                        <i class="fa fa-table" aria-hidden="true"> 搜索文章共 {{ data_count }} 篇</i>
+                    </div>
+                    <div class="col-xs-2 col-xs-offset-4" style="text-align: right;">
+                        <a href="/backend/create-article.html" target="_blank">
+                            <button class="btn btn-md btn-primary" type="submit" style="margin-bottom: 5px">
+                                <i class="fa fa-plus-circle" aria-hidden="true"></i> 创建新文章
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div style="border: 1px solid #dddddd; margin: 0; padding: 8px 0;">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>文章标题</th>
+                            <th>操作</th>
+
+                        </tr>
+                    </thead>
+                    <tbody id="tb">
+                        {% for i in article_list3 %}
+                            <tr>
+{#                                <td>{{ forloop.counter }}</td>#}
+                                <td>{{ i.index }}</td>
+                                <td><a href="/{{ i.article.blog.site }}/{{ i.article.aid }}.html">{{ i.article }}</a></td>
+                                <td>
+                                    <a class="btn btn-danger btn-xs">
+                                        <i aid="{{ i.article.aid }}" class="fa fa-times deleteitem" aria-hidden="true">删除</i>
+                                    </a>
+                                    |
+                                    <a class="btn btn-primary btn-xs" href="/backend/edit-article-{{ i.article.aid }}.html">
+                                        <i class="fa fa-pencil-square-o" aria-hidden="true">编辑</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                {# 删除模态对话框 #}
+                <div class="modal fade" id="delModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="margin-top: 100px ">
+                    <div class="modal-dialog" role="document">
+                        <div class="alert alert-danger" role="alert">
+                            <div> <input type="text" style="display: none" id="delNid"><h3>确定删除文章？？</h3></div>
+                            <div>
+                                <button type="button" class="btn btn-danger">取消</button>
+                                <button type="button" class="btn btn-danger" id="delConfirm">确定</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-12 col-xs-offset-5">
+                        <ul class="pagination" style="margin: 0">
+                           {{ page_str }}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $(function () {
+            BindDel();
+            BindDelConfirm();
+        });
+    
+        function BindDel() {
+            $('#tb').on('click', '.deleteitem', function () {
+                $('#delModal').modal('show');
+                var Aid = $(this).attr('aid');
+                $('#delNid').val(Aid)
+
+            });
+            {#$('.deleteitem').click(function () {#}
+            {#    $('#delModal').modal('show');#}
+            {# })#}
+        }
+
+        function BindDelConfirm() {
+            $('#delConfirm').click(function () {
+                var AAid = $('#delNid').val();
+
+                $.ajax({
+                    url: '/backend/delete-article.html',
+                    type: 'GET',
+                    data: {'aid':AAid},
+                    dataType: 'JSON',
+                    success: function (arg) {
+                        if (arg.status){
+                            $('#delModal').modal('hide');
+                            location.href = '/backend/article-0-0.html'
+                        }
+                    }
+                })
+
+            })
+        }
+
+    </script>
+{% endblock %}

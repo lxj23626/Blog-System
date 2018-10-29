@@ -1,0 +1,264 @@
+{% extends 'web/myblog_base.html' %}
+{% load like_or_not %}
+{% load reply %}
+
+{% block title %}文章详情{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+
+    <style>
+        .recommend .up, .down:hover{
+            cursor: pointer;
+        }
+        .reply:hover{
+            cursor: pointer;
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div class="article">
+            <h1 class="page-header">{{ article.title }}</h1>
+            <h4>{{ article.article_detail.content|safe }}</h4>
+            <hr>
+        </div>
+
+        <div class="recommend">
+            {% like uid article %}
+        </div>
+
+        <div class="footer">
+            <span>{{ article.create_time }}</span>
+            <span>|</span>
+            <span>阅读({{ article.read_count }})</span>
+            <span>|</span>
+            <span>评论({{ article.comment_count }})</span>
+            <span>|</span>
+        </div>
+
+        <div>
+            <div style="border: #e0e0e0 1px dashed; padding: 10px; font-family: 微软雅黑; font-size: 11px;" id="PSignature">
+                <div style="float:left;width:70px;">
+                    <img src="/static/imgs/o_Warning.png" style="width:65px; height:65px">
+                </div>
+                <div style="float:left;padding-top:10px;">
+                    <div style="padding: 1px">作者：<a href="http://127.0.0.1:8002/superoot.html" target="_blank">{{ blog.user.nickname }}</a></div>
+                    <div style="padding: 1px">出处：<a href="/" target="_blank">http://www.myblog.com</a></div>
+                    <div style="padding: 1px">本文版权归作者所有，欢迎转载，但未经作者同意必须保留此段声明，且在文章页面明显位置给出原文连接</div>
+                </div>
+                <div style="clear:both;"></div>
+            </div>
+        </div>
+
+        <div class="art-comment">
+            <h2 class="sub-header">评论列表</h2>
+            <div class="comment-list">
+                {% for i in comment_list %}
+                    <div class="row" >
+                        <div class="col-sm-2">
+                            <p>{{ i.index }}楼</p>
+                        </div>
+
+                        <div class="col-sm-6" style="text-align: left">
+                            <span>{{ i.comments.content }}</span>
+                        </div>
+
+                        <p class="col-sm-3">
+                            <a class="reply-name">{{ i.comments.commenter.nickname }}</a>
+                            <span>
+                                {% if i.comments.reply_id %}
+                                    回复 <a>{% reply_func article i.comments.reply_id %}</a>
+                                    于
+                                    <a>{{ i.comments.create_time|date:"Y-m-d H:i" }}</a>
+                                {% else %}
+                                    评论于
+                                    <a>{{ i.comments.create_time|date:"Y-m-d H:i" }}</a>
+                                {% endif %}
+                            </span>
+                        </p>
+
+                        <div>
+                            <a class="reply" cid="{{ i.comments.cid }}">回复</a>
+                        </div>
+                    </div>
+                    <hr>
+                {% endfor %}
+            </div>
+
+            <div class="comment-area">
+                <div class="replay-comment-user"></div>
+                <div class="reply-area" style="position: relative;">
+                    {% if not request.session.userinfo %}
+                        <div style="text-align:center; line-height:200px; position:absolute; top:0; left:0; right:0; bottom:0; background-color:rgba(255,255,255,0.6)">
+                            您需要登录后才可以回帖 <a href="/login.html">登录</a> | <a href="/register.html">立即注册</a>
+                        </div>
+                    {% endif %}
+
+                    <textarea name="content" style="width: 100%; height:200px; visibility:hidden;"></textarea>
+                </div>
+
+                <div>
+                    {% if request.session.userinfo %}
+                        <div class="reply-btn">
+                            <span class="word_count2"></span>
+                            <span>/255字</span>
+                            <span class="word_surplus"></span>
+                            <a class="col-sm-2 btn btn-primary send" style="display: block">发表回复</a>
+    {#                        {% url 'detail' site=blog.site aid=article.aid %}#}
+                    {% else %}
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script charset="utf-8" src="/static/plugins/kindeditor/kindeditor-min.js"></script>
+    <script charset="utf-8" src="/static/plugins/kindeditor/lang/zh_CN.js"></script>
+    <script>
+        //限制字数
+        var limitNum = 255;                             //设定限制字数
+        var pattern = '还可以输入' + limitNum + '字';
+
+        var editor;
+        KindEditor.ready(function (K) {
+            editor = K.create('textarea[name="content"]',{
+                resizeType:1,
+                allowPreviewEmoticons: false,
+                allowImageUpload: false,
+                items: [
+                    'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
+                    'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
+                    'insertunorderedlist', '|', 'emoticons', 'image', 'link'],
+
+                afterChange: function() {
+                    if(this.count('text') > limitNum) {
+                        pattern = ('字数超过限制，请适当删除部分内容');     // 超过字数限制自动截取
+                        $('.word_surplus').html(pattern).css('color','red');               //输入显示
+
+                        {#var strValue = editor.text();#}
+                        {#strValue = strValue.substring(0,limitNum);  // 从0开始截取，截取到限定字数#}
+                        {#editor.text(strValue);#}
+                    } else {
+                        //计算剩余字数
+                        var result = limitNum - this.count('text');
+                        pattern = '还可以输入' +  result + '字';
+                        $('.word_surplus').html(pattern).css('color','');               //输入显示
+                        }
+                    {# $('.word_count2').html(this.count());           //字数统计包含HTML代码 #}
+                    $('.word_count2').html(this.count('text'));     //字数统计包含纯文本、IMG、EMBED，不包含换行符，IMG和EMBED算一个文字
+
+                },
+
+                {#uploadJson: '/laocunzhang.html',                    // 指定上传图片的url#}
+
+            })
+
+        });
+
+
+        $(function () {
+            thumbs_up();
+            thumbs_down();
+            reply();
+            send();
+        });
+
+        function thumbs_up() {
+            $('.up').click(function () {
+                $.ajax({
+                    url: '/{{ blog.site }}/{{ article.aid }}.html',
+                    type: 'POST',
+                    data: {'thumbs':'up', csrfmiddlewaretoken: '{{ csrf_token }}'},
+                    dataType: 'JSON',
+                    success: function (arg) {
+                        {#location.href;          {# 跳转回当前页 #}
+                        {#if(arg.msg == '踩过'){#}
+                        {#    alert('该文章已经踩过')#}
+                        {# }else{ #}
+                        {#    location.reload();#}
+
+                        if (arg.code == 4001) {
+                            alert(arg.msg);
+                            location.href = '/login.html';
+                        }else if(arg.code == 4002|arg.code == 4003){
+                            alert(arg.msg);
+                        }else{
+                            location.reload();
+                        }
+                    }
+                })
+            })
+        }
+
+
+        function thumbs_down() {
+            $('.down').click(function () {
+                $.ajax({
+                    url:'/{{ blog.site }}/{{ article.aid }}.html',
+                    type:'POST',
+                    data:{'thumbs':'down', csrfmiddlewaretoken: '{{ csrf_token }}'},
+                    dataType:'JSON',
+                    success: function (arg) {
+                        {#location.href;#}
+                        {#if(arg.msg == '赞过'){#}
+                        {#    alert('该文章已经赞过')#}
+                        {# }else{#}
+                        {#    location.reload();#}
+                        {# }#}
+
+                        if (arg.code == 4001) {
+                            alert(arg.msg);
+                            location.href = '/login.html';
+                        }else if(arg.code == 4002|arg.code == 4003){
+                            alert(arg.msg);
+                        }else{
+                            location.reload();
+                        }
+                    }
+                })
+            })
+        }
+
+
+        function reply() {
+            $('.reply').click(function () {
+                if ('{{ request.session.userinfo }}'){
+                    var aa = $(this).parent().siblings('p').children('.reply-name').html();
+                    {#console.log(aa);#}
+                    var content = '@ '+aa+':\n';
+                    editor.html(content)
+                 }else{
+                    alert('请先登录')
+                 }
+            })
+        }
+
+        function send() {
+            $('.send').click(function () {
+                {#console.log(1213,$('.reply').attr('cid'))#}
+
+                var html = editor.html();
+
+                $.ajax({
+                    url: '/send.html',
+                    type:'POST',
+                    data:{'html':html, csrfmiddlewaretoken: '{{ csrf_token }}', 'article':'{{ article.aid }}','reply_id':$('.reply').attr('cid')},
+                    dataType: 'JSON',
+                    success: function (arg) {
+                        if(arg.status){
+                            location.reload()
+                        }
+                    }
+                })
+            })
+        }
+
+    </script>
+{% endblock %}
+

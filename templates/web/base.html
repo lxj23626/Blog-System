@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+{#    <link rel="icon" href="../../favicon.ico">#}
+
+    <title>{% block title %}base{% endblock %}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/plugins/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="/static/plugins/bootstrap/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/static/plugins/bootstrap/css/offcanvas.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/plugins/font-awesome/css/font-awesome.css"/>
+    <link href="/static/plugins/bootstrap/css/blog.css" rel="stylesheet">
+
+    <script src="/static/plugins/bootstrap/js/ie-emulation-modes-warning.js"></script>
+
+    {% block css %}{% endblock %}
+</head>
+
+<body>
+    <nav class="navbar navbar-fixed-top navbar-inverse">
+        <div class="container">
+            <div class="navbar-header">     {# 头部信息 #}
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">不是博客园的博客园</a>
+            </div>
+
+
+            <div id="navbar" class="collapse navbar-collapse">
+                {% block left_header %}
+                {% endblock %}
+
+                <ul class="nav navbar-nav navbar-right">
+                    {% if request.session.userinfo %}
+                        <li><a href="/{{ request.session.userinfo.blog__site }}.html">我的博客</a></li>
+                        <li><a href="/backend/userinfo.html">我的管理</a></li>
+                        <li><a href="/logout.html">注销</a></li>
+
+                    {% else %}
+                        <li><a href="/login.html">登录</a></li>
+                        <li><a href="/register.html">注册</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div><!-- /.container -->
+    </nav><!-- /.navbar -->
+
+    {% block container %}{% endblock %}
+
+    <footer class="blog-footer" style="background-color: white">
+        <p>Blog template built for <a href="http://getbootstrap.com">Bootstrap</a> by <a href="https://twitter.com/mdo">@mdo</a>.</p>
+        <p>
+            <a href="#">Back to top</a>
+        </p>
+    </footer>
+
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/static/plugins/bootstrap/js/jquery.js"></script>
+    <!--<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>-->
+    <script src="/static/plugins/bootstrap/js/bootstrap.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="/static/plugins/bootstrap/js/ie10-viewport-bug-workaround.js"></script>
+    <script src="/static/plugins/bootstrap/js/offcanvas.js"></script>
+{#    <script src="/static/js/jquery-1.12.4.js"></script>#}
+
+    {% block js %}{% endblock %}
+</body>
+</html>

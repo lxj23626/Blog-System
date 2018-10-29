@@ -1,0 +1,73 @@
+{% extends 'web/base.html' %}
+{% load article_type %}
+{% block title %}我的博客模板{% endblock %}
+
+{% block css %}
+    <link href="/static/plugins/bootstrap/css/dashboard.css" rel="stylesheet">
+    <link href="/static/css/left_menu.css" rel="stylesheet">
+{% endblock %}
+
+{% block container %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-3 col-md-2 sidebar" style="width: 15%;">
+                <div  class="row placeholders" style=" margin-bottom: 1px;">
+                    <div class="placeholder">
+                        {% if blog.user.avatar %}
+                            <img src="/static/imgs/avatar/{{ blog.user.avatar }}" style="max-width:60%" class="img-responsive" alt="Generic placeholder thumbnail" width="200" height="200">
+                        {% else %}
+                            <img src="/static/imgs/avatar/default.png" class="img-responsive" alt="Generic placeholder thumbnail" width="200" height="200">
+                        {% endif %}
+                        <h4>{{ blog.user.nickname }}</h4>
+                        <span class="text-muted">{{ blog.motto }}</span>
+                    </div>
+                </div>
+
+                <div class="sub-header">
+                    粉丝：{{ fans_count }}
+                </div>
+                <div class="sub-header">
+                    关注：{{ follows_count }}
+                </div>
+                <div class="sub-header">
+                    邮箱：{{ blog.user.email }}
+                </div>
+
+                <ul class="nav nav-sidebar">
+                    <div class="menus">
+                        <div class="item">
+                            <div class="item-title">文章标签</div>
+                            <div class="item-content">
+                                {% for tag in tag_list %}
+                                    <li><a href="/{{ blog.site }}/tag/{{ tag.tid }}.html">{{ tag.title }}({{ tag.article_set.count }})</a></li>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="item-title">文章分类</div>
+                            <div class="item-content">
+                                {% for item in article_type %}
+                                    <li><a href="/{{ blog.site }}/type/{{ item.0 }}.html">{{ item.1}}({% articletype item.0 blog %})</a></li>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="item-title">时间</div>
+                            <div class="item-content">
+                                {% for date in date_list %}
+                                    <li><a href="/{{ blog.site }}/date/{{ date.ctime }}.html">{{ date.ctime}}({{ date.count }})</a></li>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </ul>
+            </div>
+        </div>
+    
+        {% block main %}{% endblock %}
+    </div>
+
+{% endblock %}
+
+{% block js %}
+{% endblock %}

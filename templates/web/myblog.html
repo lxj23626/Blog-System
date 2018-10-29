@@ -1,0 +1,36 @@
+{% extends 'web/myblog_base.html' %}
+
+{% block title %}我的博客{% endblock %}
+
+{% block main %}
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+
+        <div class="table-responsive">
+            <div>
+                {% for row in article_list %}
+                    <h2><a href="/{{ blog.site }}/{{ row.aid }}.html">{{ row.title }}</a></h2>
+                    <h4><a href="/{{ blog.site }}/{{ row.aid }}.html">{{ row.summary }}</a></h4>
+                    <h5 class="sub-header" style="padding-top: 10px;">
+                        <span>{{ row.create_time|date:"Y-m-d H:i:s" }}</span>
+                        <span>|</span>
+                        <span>阅读({{ row.read_count }})</span>
+                        <span>|</span>
+                        <span>评论({{ row.comment_count }})</span>
+                        <span>|</span>
+                        {% if request.session.userinfo %}
+                            <span>编辑</span>
+                        {% endif %}
+                    </h5>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12 col-xs-offset-5">
+                <ul class="pagination" style="margin: 0">
+                   {{ page_str }}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

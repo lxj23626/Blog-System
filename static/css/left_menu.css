@@ -1,0 +1,32 @@
+/*.menus{*/
+    /*width: 200px;*/
+    /*position: absolute;*/
+    /*left: 0;*/
+    /*bottom: 0;*/
+    /*top: 48px;*/
+/*}*/
+
+.menus .item .item-title{
+    padding: 8px;
+    background-color: #428bca;
+    margin-bottom: 3px;
+    color: white;
+    padding-left: 18px;
+}
+
+.menus .item .item-content a{
+    display: block;
+    padding: 3px;
+    border-left: 3px solid transparent;
+    padding-left: 18px;
+}
+.menus .item .item-content a:hover{
+    border-left: 3px solid #1c5a9c;
+}
+.menus .item .item-content .active{
+    /*border-left: 3px solid white;*/
+    color: red;
+    /*background-color: #428bca;*/
+
+}
+

@@ -1,0 +1,58 @@
+{% extends 'web/base.html' %}
+
+{% block title %}后台管理模板{% endblock %}
+
+{% block css %}
+    <link href="/static/plugins/bootstrap/css/dashboard.css" rel="stylesheet">
+    <link href="/static/css/backend_left_menu.css" rel="stylesheet">
+
+
+{% endblock %}
+
+{% block container %}
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col-sm-3 col-md-2 sidebar" style="width: 15%;">
+                <ul class="nav nav-sidebar">
+                    <div class="menus">
+                        <div id="item1" class="item">
+                            <div class="item-title">
+                                <a href="/backend/userinfo.html" style="display: block">
+                                    <i class="fa fa-cogs" aria-hidden="true">
+                                        <span>个人信息</span>
+                                    </i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div id="item2" class="item">
+                            <div class="item-title">
+                                <a href="/backend/article-0-0.html" style="display: block">
+                                    <i class="fa fa-cogs" aria-hidden="true">
+                                        <span>文章管理</span>
+                                    </i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div id="item3" class="item">
+                            <div class="item-title">
+                                <a href="/backend/tag.html" style="display: block">
+                                    <i class="fa fa-cogs" aria-hidden="true">
+                                        <span>标签管理</span>
+                                    </i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    {% block main %}{% endblock %}
+{% endblock %}
+
+{% block js %}{% endblock %}

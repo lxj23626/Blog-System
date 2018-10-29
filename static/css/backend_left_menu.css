@@ -1,0 +1,23 @@
+.menus .item .item-title{
+    padding: 8px;
+    background-color: #f5f5f5;
+    border-left: 5px solid transparent;
+    /*margin-bottom: 3px;*/
+    /*color: #428bca;*/
+    padding-left: 18px;
+}
+
+.menus .item .item-title:hover{
+    background-color: #428bca;
+    cursor: pointer;
+}
+
+.menus .item .item-title:hover a{
+    background-color: #428bca;
+    color: #fff;
+    cursor: pointer;
+}
+
+.menus .item .item-title span{
+    padding-left: 5px;
+}

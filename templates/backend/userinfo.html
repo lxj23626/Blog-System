@@ -1,0 +1,186 @@
+{% extends 'backend/backend_base.html' %}
+
+{%  block css %}
+    {{ block.super }}
+    <style>
+
+        #item1 .item-title{
+            {#border-left: 3px solid transparent;#}
+            border-left: 5px solid #1c5a9c;
+        }
+
+        .avatar-container {
+            height: 200px;
+            width: 200px;
+            padding: 2px;
+            border: 1px solid #dddddd;
+            position: relative;             {# 给下一个absolute定位 #}
+            overflow: hidden;
+
+        }
+        .avatar-container img {
+            {#height: auto;#}
+            width: 100%;
+            border: 0;
+            {#opacity:0.2;#}
+            {#vertical-align: middle;#}
+            {#background-position: -50px 0px;#}
+        }
+        .avatar-container #avatarImg{
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0;
+            position: absolute;
+            {#z-index: 102;#}
+            border: 5px solid #4cae4c;
+        }
+
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div style="margin-left: -60px">
+            <ol class="breadcrumb" style="margin-bottom: 0;">
+                <li><a href="#">个人管理</a></li>
+                <li class="active">个人信息</li>
+            </ol>
+
+            <div style="border: 1px #dddddd; border-left: 3px solid #337ab7;">
+                <div  class="row" style="margin: 0; padding: 8px 0;">
+                    <div class="col-xs-6" style="text-align: left;">
+                        <i class="fa fa-table" aria-hidden="true"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div style="border: 1px solid #dddddd; margin: 0; padding: 8px 0;">
+                <div class="row" style="margin: 0; padding: 8px 0; position: relative">
+                    <form method="post" action="/backend/userinfo.html" class="form-horizontal" novalidate>
+                        {% csrf_token %}
+                        <div class="col-xs-12" >
+                            <div class="form-group">
+                                <label class="col-xs-1 control-label">用户名：</label>
+                                <div class="col-xs-3" style="text-align: left;">
+                                    {{ userform.username }}
+                                </div>
+                            </div>
+
+                            <div class="form-group" >
+                                <label class="col-xs-1 control-label">邮箱：</label>
+                                <div class="col-xs-3" style="text-align: left;">
+                                    {{ userform.email }}
+                                </div>
+                            </div>
+
+                            <div class="form-group" >
+                                <label class="col-xs-1 control-label">昵称：</label>
+                                <div class="col-xs-3" style="text-align: left;">
+                                    {{ userform.nickname }}
+                                </div>
+                            </div>
+
+                            <div class="form-group" >
+                                <label class="col-xs-1 control-label">博客名：</label>
+
+                                <div class="col-xs-3" style="text-align: left;">
+                                    {{ userform.blog_title }}
+                                </div>
+                            </div>
+
+
+                            <div class="form-group" >
+                                <label class="col-xs-1 control-label">博客地址：</label>
+                                <div class="col-xs-3" style="text-align: left;">
+                                    {{ userform.blog_site }}
+                                </div>
+                            </div>
+
+                            <div class="form-group" >
+                                <label class="col-xs-1 control-label">博客主题：</label>
+                                <div class="col-xs-3" style="text-align: left;">
+                                    {{ userform.blog_theme }}
+                                </div>
+                            </div>
+
+                            <div class="form-group" >
+                                <label class="col-xs-1 control-label">博客座右铭:</label>
+
+                                <div class="col-xs-3" style="text-align: left;">
+                                    {{ userform.blog_motto }}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-xs-11" style="text-align: center;">
+                                    <input class="btn btn-primary" type="submit" value="保存">
+                                    <span style="color: red">{{ userform.email.errors.0 }}{{ userform.non_field_errors }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="col-xs-offset-7 col-xs-5" style="position: absolute; text-align: left;">
+                        <div class="avatar-container">
+                            <iframe id="upload_iframe" name="upload_iframe" style="display: none"></iframe>     {# 为了显示更换后的图片，不加这行换图片会跳转返回json数据 #}
+                            <form method="post" action="/backend/upload-avatar.html" enctype="multipart/form-data" target="upload_iframe">
+                                {% csrf_token %}
+                                {# 显示原来的图片 #}
+                                <img id="previewImg" origin="/static/imgs/avatar/{{ avatar }}"
+                                    src="/static/imgs/avatar/{{ avatar }}"
+                                    style="border-radius: 50%">
+                                {{ avatarform.avatar }}
+                            </form>
+                        </div>
+                        <div style="text-align: left;">
+                            <input style="width: 200px; margin-top: 20px" id="retract" class="btn btn-danger" type="submit" value="撤销更换头像">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $(function () {
+            BindChangeAvatar4();
+            retract();
+        });
+    
+        function BindChangeAvatar4() {
+            $('#avatarImg').change(function () {
+                $(this).parent().submit();              {# form对象提交 #}
+
+                $('#upload_iframe').load(function () {
+                    var iframeContents = this.contentWindow.document.body.innerText;        {# 获取后端返回给iframe的内容 #}
+                    iframeContents = JSON.parse(iframeContents);
+
+                    if (iframeContents.status){
+                        $('#previewImg').attr('src','/'+iframeContents.data);
+                    }
+                })
+            })
+        }
+
+
+        function retract() {
+            $('#retract').click(function () {
+                var originImg = $('#previewImg').attr('origin');
+
+                $.ajax({
+                    url:'/backend/upload-avatar.html',
+                    type:'GET',
+                    data:{'retract':originImg},
+                    dataType:'JSON',
+                    success: function (arg) {
+                        $('#previewImg').attr('src', originImg);
+                    }
+                })
+            })
+        }
+    </script>
+{% endblock %}
